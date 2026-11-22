@@ -9,66 +9,130 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root { --gold: #C9A050; --gold-dim: #7A6330; --bg: #0c0f12; --bg-raised: #14181d; --bg-sunken: #08090b; --surface: #181d23; --border: #262c33; --border-strong: #3a424c; --text: #eef1f4; --text-dim: #8b95a1; --teal: #2dd4bf; --red: #ef4444; --purple: #a855f7; --font-display: 'Cairo', sans-serif; --font-mono: 'JetBrains Mono', monospace; }
+/* ============================================================
+   DESIGN SYSTEM — Plate Pro Admin
+   ============================================================ */
+:root {
+    --gold: #C9A050;
+    --gold-dim: #7A6330;
+    --navy: #1A1A2E;
+    --navy-light: #2A2A4E;
+    --bg: #0c0f12;
+    --bg-raised: #14181d;
+    --bg-sunken: #08090b;
+    --surface: #181d23;
+    --border: #262c33;
+    --border-strong: #3a424c;
+    --text: #eef1f4;
+    --text-dim: #8b95a1;
+    --text-faint: #565f6a;
+    --teal: #2dd4bf;
+    --teal-dim: #0f3d38;
+    --red: #ef4444;
+    --red-dim: #3d1616;
+    --purple: #a855f7;
+    --purple-dim: #4c1d95;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --font-display: 'Cairo', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: var(--font-display); background: var(--bg); color: var(--text); min-height: 100vh; }
-button, input, select { font-family: inherit; }
+body { font-family: var(--font-display); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font-family: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.screen { display: none; min-height: 100vh; } .screen.active { display: block; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
+
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
 .centered-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
 .brand-mark { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
 .brand-title { font-size: 22px; font-weight: 800; margin-bottom: 24px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 100%; max-width: 380px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; width: 100%; max-width: 380px; }
 .field { margin-bottom: 14px; text-align: right; }
 .field label { display: block; font-size: 12.5px; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
-.field input, .field select { width: 100%; padding: 12px 14px; background: var(--bg-sunken); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 15px; outline: none; }
-.field input:focus { border-color: var(--gold); }
-.btn { border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; padding: 12px 18px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform .15s; color: var(--bg); }
-.btn:active { transform: scale(0.97); } .btn:disabled { opacity: .4; }
-.btn-block { width: 100%; } .btn-gold { background: var(--gold); } .btn-teal { background: var(--teal); }
-.btn-red { background: var(--red); color: #fff; } .btn-ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--text); }
+.field input, .field select { width: 100%; padding: 12px 14px; background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 15px; outline: none; }
+.field input:focus, .field select:focus { border-color: var(--gold); }
+.btn { border: none; border-radius: var(--radius-sm); font-weight: 700; font-size: 14px; cursor: pointer; padding: 12px 18px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform .15s var(--ease), opacity .15s; color: var(--bg); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-block { width: 100%; }
+.btn-gold { background: var(--gold); }
+.btn-teal { background: var(--teal); }
+.btn-red { background: var(--red); color: #fff; }
+.btn-ghost { background: transparent; border: 1px solid var(--border-strong); color: var(--text); }
+.btn-ghost:hover { background: var(--surface); }
 .btn-sm { padding: 7px 12px; font-size: 12.5px; }
 .error-text { color: var(--red); font-size: 13px; margin-top: 8px; min-height: 16px; }
-.topbar { position: sticky; top: 0; background: rgba(12,15,18,.92); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
-.topbar .title { font-weight: 800; font-size: 15px; } .topbar .title .gold { color: var(--gold); }
+.success-text { color: var(--teal); font-size: 13px; margin-top: 8px; min-height: 16px; }
+
+.topbar { position: sticky; top: 0; z-index: 20; background: rgba(12,15,18,.92); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.topbar .title { font-weight: 800; font-size: 15px; }
+.topbar .title .gold { color: var(--gold); }
 .wrap { max-width: 900px; margin: 0 auto; padding: 18px; }
-.section-title { font-size: 12.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin: 22px 0 10px; }
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 6px 14px; }
+.section-title { font-size: 12.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; margin: 22px 0 10px; }
+.section-title:first-child { margin-top: 0; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 6px 14px; }
 .list-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 4px; border-bottom: 1px solid var(--border); }
-.list-row:last-child { border-bottom: none; } .row-title { font-weight: 700; font-size: 14.5px; } .row-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.list-row:last-child { border-bottom: none; }
+.row-title { font-weight: 700; font-size: 14.5px; }
+.row-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.badge-teal { background: #0f3d38; color: var(--teal); } .badge-red { background: #3d1616; color: #ff8f8f; } .badge-gold { background: #7A6330; color: var(--gold); } .badge-purple { background: #4c1d95; color: var(--purple); }
-.biz-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: border-color .15s; }
-.biz-card:hover { border-color: var(--gold); } .biz-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 12px; }
-.empty { text-align: center; padding: 30px 16px; color: var(--text-dim); } .empty i { font-size: 24px; display: block; margin-bottom: 8px; }
-.overlay { display: none; position: fixed; inset: 0; background: rgba(5,6,8,.82); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
-.overlay.show { display: flex; } .sheet { background: var(--bg-raised); border: 1px solid var(--border); border-radius: 18px; width: 100%; max-width: 440px; padding: 22px 18px; }
-.sheet-title { font-size: 16px; font-weight: 800; margin-bottom: 16px; display: flex; justify-content: space-between; }
-.toast { position: fixed; bottom: 24px; left: 16px; right: 16px; max-width: 480px; margin: 0 auto; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 13.5px; text-align: center; z-index: 999; display: none; color: #fff; }
-.toast.success { background: #16825a; } .toast.error { background: #b3261e; }
-.back-btn { color: var(--text-dim); background: none; border: none; font-size: 14px; cursor: pointer; margin-bottom: 14px; }
-.code-chip { font-family: var(--font-mono); background: var(--bg-sunken); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 15px; }
+.badge-teal { background: var(--teal-dim); color: var(--teal); }
+.badge-red { background: var(--red-dim); color: #ff8f8f; }
+.badge-gold { background: var(--gold-dim); color: var(--gold); }
+.badge-purple { background: var(--purple-dim); color: var(--purple); }
+.biz-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; cursor: pointer; transition: border-color .15s var(--ease), transform .15s var(--ease); }
+.biz-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.biz-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 12px; }
+.empty { text-align: center; padding: 30px 16px; color: var(--text-dim); }
+.empty i { font-size: 24px; color: var(--text-faint); margin-bottom: 8px; display: block; }
+
+.overlay { display: none; position: fixed; inset: 0; background: rgba(5,6,8,.82); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+.overlay.show { display: flex; }
+.sheet { background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto; padding: 22px 18px; }
+.sheet-title { font-size: 16px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.sheet-title .close-x { color: var(--text-dim); background: none; border: none; font-size: 18px; cursor: pointer; }
+
+.toast { position: fixed; bottom: 24px; left: 16px; right: 16px; max-width: 480px; margin: 0 auto; padding: 14px 18px; border-radius: var(--radius-sm); font-weight: 700; font-size: 13.5px; text-align: center; z-index: 999; display: none; color: #fff; }
+.toast.success { background: #16825a; }
+.toast.error { background: #b3261e; }
+.toast.warning { background: #9a5a12; }
+
+.back-btn { color: var(--text-dim); background: none; border: none; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+.back-btn:hover { color: var(--text); }
+.code-chip { font-family: var(--font-mono); background: var(--bg-sunken); border: 1px solid var(--border); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 15px; letter-spacing: .05em; }
+
+.debug-box { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-top: 8px; font-size: 12px; font-family: var(--font-mono); color: var(--text-dim); max-height: 200px; overflow: auto; white-space: pre-wrap; }
 </style>
 </head>
 <body>
 
+<!-- ============== LOGIN ============== -->
 <div id="loginScreen" class="screen active">
     <div class="centered-screen">
         <div class="brand-mark">🍽️ PLATE PRO</div>
         <div class="brand-title">لوحة الأدمن</div>
         <div class="card">
-            <div class="field"><label>إيميل الأدمن</label><input type="email" id="adminEmail" placeholder="admin@platepro.com"></div>
-            <div class="field"><label>كلمة المرور</label><input type="password" id="adminPassword" placeholder="••••••••"></div>
+            <div class="field">
+                <label>كلمة مرور الأدمن</label>
+                <input type="password" id="adminPassword" placeholder="••••••••">
+            </div>
             <button class="btn btn-gold btn-block" onclick="handleAdminLogin()"><i class="fa-solid fa-unlock"></i> دخول</button>
             <div class="error-text" id="loginError"></div>
         </div>
     </div>
 </div>
 
+<!-- ============== DASHBOARD ============== -->
 <div id="dashboardScreen" class="screen">
     <div class="topbar">
         <div class="title"><i class="fa-solid fa-shield-halved" style="color:var(--gold);"></i> <span class="gold">لوحة</span> الأدمن</div>
-        <button class="btn btn-ghost btn-sm" onclick="logoutAdmin()">خروج</button>
+        <button class="btn btn-ghost btn-sm" onclick="logoutAdmin()"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
     </div>
     <div class="wrap">
         <div class="section-title">المطاعم والكافيهات</div>
@@ -77,47 +141,90 @@ button, input, select { font-family: inherit; }
     </div>
 </div>
 
+<!-- ============== BUSINESS DETAIL ============== -->
 <div id="businessDetailScreen" class="screen">
     <div class="topbar">
         <div class="title" id="detailBizTitle">—</div>
-        <button class="btn btn-ghost btn-sm" onclick="logoutAdmin()">خروج</button>
+        <button class="btn btn-ghost btn-sm" onclick="logoutAdmin()"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
     </div>
     <div class="wrap">
         <button class="back-btn" onclick="showScreen('dashboardScreen'); loadBusinesses();"><i class="fa-solid fa-arrow-right"></i> رجوع للقائمة</button>
+
         <div class="section-title">بيانات المطعم / الكافيه</div>
         <div class="panel" id="detailBizInfo"></div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
             <button class="btn btn-red btn-sm" onclick="deleteBusiness()"><i class="fa-solid fa-trash"></i> حذف النشاط</button>
-            <button class="btn btn-teal btn-sm" onclick="setAllLifetime()"><i class="fa-solid fa-infinity"></i> مدى الحياة</button>
+            <button class="btn btn-teal btn-sm" onclick="setAllLifetime()"><i class="fa-solid fa-infinity"></i> جعل كل الأجهزة مدى الحياة</button>
+            <button class="btn btn-ghost btn-sm" onclick="generateSampleMenu()"><i class="fa-solid fa-utensils"></i> توليد منيو تجريبي</button>
         </div>
+
         <div class="section-title">أكواد التفعيل</div>
         <button class="btn btn-ghost btn-block" style="margin-bottom:10px;" onclick="generateActivationCode()"><i class="fa-solid fa-key"></i> توليد كود جديد</button>
         <div class="panel" id="codesList"></div>
+
         <div class="section-title">الأجهزة المفعّلة</div>
         <div class="panel" id="devicesList"></div>
+        
+        <div class="section-title">الطاولات</div>
+        <div class="panel" id="tablesList"></div>
     </div>
 </div>
 
+<!-- ============== CREATE BUSINESS SHEET ============== -->
 <div class="overlay" id="createBusinessOverlay">
     <div class="sheet">
-        <div class="sheet-title">إنشاء مطعم / كافيه جديد<button class="btn btn-ghost btn-sm" onclick="closeSheet('createBusinessOverlay')"><i class="fa-solid fa-xmark"></i></button></div>
-        <div class="field"><label>كود النشاط (إنجليزي)</label><input type="text" id="newBizCode" class="mono" style="text-transform:uppercase" placeholder="CAFE01"></div>
+        <div class="sheet-title">إنشاء مطعم / كافيه جديد<button class="close-x" onclick="closeSheet('createBusinessOverlay')"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="field"><label>كود النشاط (بالإنجليزي، بدون مسافات)</label><input type="text" id="newBizCode" class="mono" style="text-transform:uppercase" placeholder="CAFE01"></div>
         <div class="field"><label>اسم المطعم / الكافيه</label><input type="text" id="newBizName" placeholder="اسم المحل"></div>
-        <div class="field"><label>PIN المالك (4-8 أرقام)</label><input type="text" inputmode="numeric" maxlength="8" id="newBizPin" class="mono" placeholder="1234"></div>
+        <div class="field"><label>PIN المالك (4 أرقام)</label><input type="text" inputmode="numeric" maxlength="6" id="newBizPin" class="mono" placeholder="1234"></div>
         <button class="btn btn-gold btn-block" onclick="submitCreateBusiness()">إنشاء</button>
         <div class="error-text" id="createBizError"></div>
+        <div class="success-text" id="createBizSuccess"></div>
+        <div class="debug-box" id="createBizDebug"></div>
+    </div>
+</div>
+
+<!-- ============== EDIT DEVICE TYPE SHEET ============== -->
+<div class="overlay" id="editDeviceOverlay">
+    <div class="sheet">
+        <div class="sheet-title">تعديل نوع الجهاز<button class="close-x" onclick="closeSheet('editDeviceOverlay')"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="field">
+            <label>نوع الجهاز</label>
+            <select id="editDeviceType">
+                <option value="unknown">❓ غير معروف</option>
+                <option value="phone">📱 تليفون</option>
+                <option value="tablet">📱 تابلت</option>
+                <option value="computer">💻 كمبيوتر</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>اسم الجهاز (اختياري)</label>
+            <input type="text" id="editDeviceLabel" placeholder="مثال: تابلت الكاونتر">
+        </div>
+        <button class="btn btn-gold btn-block" onclick="submitEditDevice()">حفظ</button>
+        <div class="error-text" id="editDeviceError"></div>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ============================================================
+// CONFIG — Plate Pro Supabase
+// ============================================================
 const SUPABASE_URL = 'https://bccuzjjnrqnmqwcypucr.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_X3pnp718gcVx9-wrisvtHw_44hMVVZ_';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let currentBusinessId = null;
+// Admin password (change this before deploying!)
+const ADMIN_PASSWORD = '1234';
 
+let currentBusinessId = null;
+let editingDeviceId = null;
+
+// ============================================================
+// UTILITIES
+// ============================================================
 function showToast(msg, type = 'success') {
     const el = document.getElementById('toast');
     el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
@@ -127,180 +234,470 @@ function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.cl
 function openSheet(id) { document.getElementById(id).classList.add('show'); }
 function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
 function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
-function randomCode() { const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let out = ''; for (let i = 0; i < 8; i++) { out += chars[Math.floor(Math.random() * chars.length)]; if (i === 3) out += '-'; } return out; }
+function randomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let out = '';
+    for (let i = 0; i < 8; i++) { out += chars[Math.floor(Math.random() * chars.length)]; if (i === 3) out += '-'; }
+    return out;
+}
 
-// ✅ 1. تسجيل الدخول بـ Auth الحقيقي
-async function handleAdminLogin() {
-    const email = document.getElementById('adminEmail').value.trim();
+// ============================================================
+// AUTH
+// ============================================================
+function handleAdminLogin() {
     const pass = document.getElementById('adminPassword').value;
     const err = document.getElementById('loginError');
+    if (pass !== ADMIN_PASSWORD) { err.textContent = 'كلمة المرور غلط.'; return; }
     err.textContent = '';
-    if (!email || !pass) { err.textContent = 'اكتب الإيميل والباسورد'; return; }
-
-    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-    if (authError) { err.textContent = 'بيانات الدخول غلط'; return; }
-
-    if (authData.user.app_metadata?.role !== 'super_admin') { 
-        await supabaseClient.auth.signOut();
-        err.textContent = 'ده مش حساب أدمن!'; 
-        return; 
-    }
+    document.getElementById('adminPassword').value = '';
     showScreen('dashboardScreen');
     loadBusinesses();
 }
+function logoutAdmin() { showScreen('loginScreen'); }
 
-async function logoutAdmin() {
-    await supabaseClient.auth.signOut();
-    showScreen('loginScreen');
-}
-
-// ✅ 2. تحميل قائمة المطاعم
+// ============================================================
+// DASHBOARD — businesses list
+// ============================================================
 async function loadBusinesses() {
-    const grid = document.getElementById('businessGrid');
-    grid.innerHTML = '<div class="empty">جاري التحميل...</div>';
-    
-    const { data: businesses, error } = await supabaseClient.from('businesses').select('id, name, code, created_at').order('created_at', { ascending: false });
-    
-    if (error) { grid.innerHTML = '<div class="empty">فشل التحميل: ' + error.message + '</div>'; return; }
-    if (!businesses || businesses.length === 0) { grid.innerHTML = '<div class="empty">مفيش مطاعم لسه</div>'; return; }
+    try {
+        const { data: businesses, error } = await supabaseClient.from('businesses').select('*').order('created_at', { ascending: false });
+        const grid = document.getElementById('businessGrid');
+        if (error) { 
+            console.error('Error loading businesses:', error);
+            grid.innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>فشل تحميل البيانات: ' + error.message + '</div>'; 
+            return; 
+        }
+        if (!businesses || businesses.length === 0) { 
+            grid.innerHTML = '<div class="empty"><i class="fa-solid fa-shop"></i>لسه مفيش أي مطعم أو كافيه — ابدأ بإنشاء واحد</div>'; 
+            return; 
+        }
 
-    const withCounts = await Promise.all(businesses.map(async b => {
-        const { count } = await supabaseClient.from('devices').select('*', { count: 'exact', head: true }).eq('business_id', b.id);
-        return { ...b, deviceCount: count || 0 };
-    }));
+        const withCounts = await Promise.all(businesses.map(async b => {
+            try {
+                const { count: deviceCount } = await supabaseClient.from('devices').select('*', { count: 'exact', head: true }).eq('business_id', b.id).eq('revoked', false);
+                const { count: tableCount } = await supabaseClient.from('tables').select('*', { count: 'exact', head: true }).eq('business_id', b.id);
+                return { ...b, deviceCount: deviceCount || 0, tableCount: tableCount || 0 };
+            } catch (e) {
+                return { ...b, deviceCount: 0, tableCount: 0 };
+            }
+        }));
 
-    grid.innerHTML = withCounts.map(b => `
-        <div class="biz-card" onclick="openBusinessDetail('${b.id}')">
-            <div class="row-title">🍽️ ${escapeHtml(b.name)}</div>
-            <div class="row-sub mono">${escapeHtml(b.code)}</div>
-            <div style="margin-top:10px;"><span class="badge badge-teal">${b.deviceCount} جهاز</span></div>
-        </div>`).join('');
+        grid.innerHTML = withCounts.map(b => `
+            <div class="biz-card" onclick="openBusinessDetail('${b.id}')">
+                <div class="row-title">🍽️ ${escapeHtml(b.name)}</div>
+                <div class="row-sub mono">${escapeHtml(b.code)}</div>
+                <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <span class="badge badge-teal">${b.deviceCount} جهاز</span>
+                    <span class="badge badge-gold">${b.tableCount} طاولة</span>
+                </div>
+            </div>`).join('');
+    } catch (e) {
+        console.error('Unexpected error in loadBusinesses:', e);
+        document.getElementById('businessGrid').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>حدث خطأ غير متوقع</div>';
+    }
 }
 
 function openCreateBusinessSheet() {
     ['newBizCode','newBizName','newBizPin'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('createBizError').textContent = '';
+    document.getElementById('createBizSuccess').textContent = '';
+    document.getElementById('createBizDebug').textContent = '';
     openSheet('createBusinessOverlay');
 }
 
-// ✅ 3. إنشاء مطعم عن طريق دالة RPC مش مباشر
+// ============================================================
+// CREATE BUSINESS — بدون phone و total_stations
+// ============================================================
 async function submitCreateBusiness() {
     const code = document.getElementById('newBizCode').value.trim().toUpperCase();
     const name = document.getElementById('newBizName').value.trim();
     const owner_pin = document.getElementById('newBizPin').value.trim();
     const err = document.getElementById('createBizError');
-    err.textContent = '';
-
-    if (!/^[A-Z0-9\-]{3,20}$/.test(code)) { err.textContent = 'كود النشاط 3-20 حرف/رقم'; return; }
-    if (!name || name.length > 100) { err.textContent = 'اكتب اسم صحيح'; return; }
-    if (!/^[0-9]{4,8}$/.test(owner_pin)) { err.textContent = 'PIN من 4-8 أرقام'; return; }
-
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const success = document.getElementById('createBizSuccess');
+    const debug = document.getElementById('createBizDebug');
     
-    const { data: bizId, error } = await supabaseClient.rpc('create_business_admin', {
-        p_code: code,
-        p_name: name,
-        p_owner_pin: owner_pin,
-        p_admin_email: user.email
-    });
+    err.textContent = '';
+    success.textContent = '';
+    debug.textContent = '';
 
-    if (error) { err.textContent = 'فشل: ' + error.message; return; }
-    showToast('تم إنشاء النشاط بنجاح 🎉', 'success');
-    setTimeout(() => { closeSheet('createBusinessOverlay'); loadBusinesses(); }, 1500);
+    if (!code || !name) { err.textContent = 'اكتب الكود والاسم.'; return; }
+    if (!/^\d{4,6}$/.test(owner_pin)) { err.textContent = 'PIN المالك لازم يكون 4 لـ 6 أرقام.'; return; }
+
+    // ✅ البيانات مع owner_pin
+    const bizData = {
+        code: code,
+        name: name,
+        owner_pin: owner_pin
+    };
+
+    debug.textContent = '📤 البيانات المرسلة:\n' + JSON.stringify(bizData, null, 2);
+
+    try {
+        const { data, error } = await supabaseClient.from('businesses').insert(bizData).select();
+        
+        debug.textContent += '\n\n📥 الرد:\n' + JSON.stringify({ data, error }, null, 2);
+        
+        if (error) {
+            console.error('Insert error:', error);
+            err.textContent = '❌ فشل الإنشاء: ' + error.message + (error.details ? ' (' + error.details + ')' : '');
+            if (error.code === '23505') {
+                err.textContent = '❌ الكود ده مستخدم قبل كده.';
+            }
+            return;
+        }
+        
+        success.textContent = '✅ تم إنشاء المطعم / الكافيه بنجاح! 🎉';
+        showToast('تم إنشاء النشاط بنجاح 🎉', 'success');
+        
+        setTimeout(() => {
+            closeSheet('createBusinessOverlay');
+            loadBusinesses();
+        }, 1500);
+        
+    } catch (e) {
+        console.error('Unexpected error:', e);
+        err.textContent = '❌ حدث خطأ غير متوقع: ' + e.message;
+        debug.textContent += '\n\n❌ Exception:\n' + e.stack;
+    }
 }
 
+// ============================================================
+// BUSINESS DETAIL
+// ============================================================
 async function openBusinessDetail(id) {
     currentBusinessId = id;
-    const { data: biz } = await supabaseClient.from('businesses').select('id, name, code, created_at').eq('id', id).single();
-    if (!biz) return;
+    try {
+        const { data: biz, error } = await supabaseClient.from('businesses').select('*').eq('id', id).single();
+        if (error || !biz) { 
+            showToast('النشاط مش موجود', 'error'); 
+            return; 
+        }
 
-    document.getElementById('detailBizTitle').textContent = '🍽️ ' + biz.name;
-    document.getElementById('detailBizInfo').innerHTML = `
-        <div class="list-row"><div class="row-title">الكود</div><div class="code-chip">${escapeHtml(biz.code)}</div></div>
-        <div class="list-row"><div class="row-title">تاريخ الإنشاء</div><div class="row-sub mono">${new Date(biz.created_at).toLocaleDateString('ar-EG')}</div></div>`;
+        document.getElementById('detailBizTitle').textContent = '🍽️ ' + biz.name;
+        document.getElementById('detailBizInfo').innerHTML = `
+            <div class="list-row"><div class="row-title">الكود</div><div class="code-chip">${escapeHtml(biz.code)}</div></div>
+            <div class="list-row"><div class="row-title">PIN المالك</div><div class="code-chip">${escapeHtml(biz.owner_pin)}</div></div>
+            <div class="list-row"><div class="row-title">تاريخ الإنشاء</div><div class="row-sub mono">${new Date(biz.created_at).toLocaleDateString('ar-EG')}</div></div>`;
 
-    showScreen('businessDetailScreen');
-    await Promise.all([loadCodes(id), loadDevices(id)]);
+        showScreen('businessDetailScreen');
+        await Promise.all([
+            loadCodes(id),
+            loadDevices(id),
+            loadTables(id)
+        ]);
+    } catch (e) {
+        console.error('Error opening business detail:', e);
+        showToast('فشل تحميل تفاصيل النشاط', 'error');
+    }
 }
 
+// ============================================================
+// ACTIVATION CODES
+// ============================================================
 async function loadCodes(businessId) {
-    const { data: codes } = await supabaseClient.from('activation_codes').select('*').eq('business_id', businessId).order('created_at', { ascending: false }).limit(20);
-    const el = document.getElementById('codesList');
-    el.innerHTML = (!codes || codes.length === 0) ? '<div class="empty">مفيش أكواد</div>' :
-        codes.map(c => `<div class="list-row">
-            <div><div class="code-chip">${escapeHtml(c.code)}</div><div class="row-sub">${c.used ? 'مستخدم' : 'متاح'}</div></div>
-            <span class="badge ${c.used ? 'badge-red' : 'badge-teal'}">${c.used ? 'مستخدم' : 'جاهز'}</span>
-        </div>`).join('');
+    try {
+        const { data: codes } = await supabaseClient.from('activation_codes').select('*').eq('business_id', businessId).order('created_at', { ascending: false }).limit(20);
+        const el = document.getElementById('codesList');
+        el.innerHTML = (!codes || codes.length === 0)
+            ? '<div class="empty"><i class="fa-solid fa-key"></i>مفيش أكواد لسه</div>'
+            : codes.map(c => `<div class="list-row">
+                <div><div class="code-chip">${escapeHtml(c.code)}</div><div class="row-sub">${c.used ? 'اتستخدم ' + new Date(c.used_at).toLocaleDateString('ar-EG') : 'متاح'}</div></div>
+                <span class="badge ${c.used ? 'badge-red' : 'badge-teal'}">${c.used ? 'مستخدم' : 'جاهز'}</span>
+            </div>`).join('');
+    } catch (e) {
+        console.error('Error loading codes:', e);
+        document.getElementById('codesList').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>فشل تحميل الأكواد</div>';
+    }
 }
 
 async function generateActivationCode() {
     const code = randomCode();
-    await supabaseClient.from('activation_codes').insert({ business_id: currentBusinessId, code });
-    showToast('تم توليد: ' + code, 'success');
-    loadCodes(currentBusinessId);
+    try {
+        const { error } = await supabaseClient.from('activation_codes').insert({ business_id: currentBusinessId, code });
+        if (error) { showToast('فشل توليد الكود: ' + error.message, 'error'); return; }
+        showToast('تم توليد الكود: ' + code, 'success');
+        loadCodes(currentBusinessId);
+    } catch (e) {
+        showToast('فشل توليد الكود', 'error');
+    }
 }
 
+// ============================================================
+// DEVICES
+// ============================================================
 async function loadDevices(businessId) {
-    const { data: devices } = await supabaseClient.from('devices').select('*').eq('business_id', businessId).order('created_at', { ascending: false });
-    const el = document.getElementById('devicesList');
-    el.innerHTML = (!devices || devices.length === 0) ? '<div class="empty">مفيش أجهزة</div>' :
-        devices.map(d => {
-            const expiry = d.expiry_date ? new Date(d.expiry_date) : null;
-            const isLifetime = !expiry || expiry.getFullYear() > 2100;
-            const expired = expiry && expiry < new Date() && !isLifetime;
-            const statusBadge = d.revoked ? '<span class="badge badge-red">موقوف</span>' : expired ? '<span class="badge badge-gold">منتهي</span>' : isLifetime ? '<span class="badge badge-purple">♾️</span>' : '<span class="badge badge-teal">نشط</span>';
-            return `<div class="list-row">
-                <div><div class="row-title">${escapeHtml(d.device_label || 'جهاز')}</div></div>
-                <div style="display:flex;gap:6px;">
-                    ${statusBadge}
-                    <button class="btn btn-ghost btn-sm" onclick="setLifetime('${d.id}')" style="color:var(--purple);"><i class="fa-solid fa-infinity"></i></button>
-                    <button class="btn btn-ghost btn-sm" onclick="extendDevice('${d.id}')"><i class="fa-solid fa-calendar-plus"></i></button>
-                    <button class="btn btn-ghost btn-sm" onclick="toggleRevokeDevice('${d.id}', ${d.revoked})"><i class="fa-solid ${d.revoked ? 'fa-lock-open' : 'fa-lock'}"></i></button>
-                </div>
-            </div>`;
-        }).join('');
+    try {
+        const { data: devices } = await supabaseClient.from('devices').select('*').eq('business_id', businessId).order('created_at', { ascending: false });
+        const el = document.getElementById('devicesList');
+        
+        const deviceTypeMap = {
+            'phone': { icon: 'fa-mobile-screen', label: 'تليفون' },
+            'tablet': { icon: 'fa-tablet-screen', label: 'تابلت' },
+            'computer': { icon: 'fa-computer', label: 'كمبيوتر' },
+            'unknown': { icon: 'fa-question', label: 'غير معروف' }
+        };
+        
+        el.innerHTML = (!devices || devices.length === 0)
+            ? '<div class="empty"><i class="fa-solid fa-mobile-screen"></i>لسه مفيش جهاز اتفعّل</div>'
+            : devices.map(d => {
+                const expiry = d.expiry_date ? new Date(d.expiry_date) : null;
+                const isLifetime = !expiry || expiry.getFullYear() > 2100;
+                const expired = expiry && expiry < new Date() && !isLifetime;
+                const statusBadge = d.revoked ? '<span class="badge badge-red">موقوف</span>' 
+                    : expired ? '<span class="badge badge-gold">منتهي</span>' 
+                    : isLifetime ? '<span class="badge badge-purple">♾️ مدى الحياة</span>' 
+                    : '<span class="badge badge-teal">نشط</span>';
+                const deviceType = deviceTypeMap[d.device_type] || deviceTypeMap['unknown'];
+                const deviceLabel = d.device_label || 'جهاز بدون اسم';
+                const expiryText = isLifetime ? '♾️ مدى الحياة' : (expiry ? 'ينتهي ' + expiry.toLocaleDateString('ar-EG') : 'بدون تاريخ انتهاء');
+                
+                return `<div class="list-row">
+                    <div>
+                        <div class="row-title"><i class="fa-solid ${deviceType.icon}" style="width:20px;color:var(--teal);"></i> ${escapeHtml(deviceLabel)}</div>
+                        <div class="row-sub mono">${escapeHtml(deviceType.label)} — ${expiryText}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                        ${statusBadge}
+                        <button class="btn btn-ghost btn-sm" onclick="setLifetime('${d.id}')" title="جعل الاشتراك مدى الحياة" style="color:var(--purple);"><i class="fa-solid fa-infinity"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="editDeviceType('${d.id}')" title="تعديل نوع الجهاز"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="extendDevice('${d.id}')" title="مد الاشتراك 30 يوم"><i class="fa-solid fa-calendar-plus"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="toggleRevokeDevice('${d.id}', ${d.revoked})"><i class="fa-solid ${d.revoked ? 'fa-lock-open' : 'fa-lock'}"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+    } catch (e) {
+        console.error('Error loading devices:', e);
+        document.getElementById('devicesList').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>فشل تحميل الأجهزة</div>';
+    }
 }
 
 async function extendDevice(deviceId) {
-    const { data: dev } = await supabaseClient.from('devices').select('expiry_date').eq('id', deviceId).single();
-    if (!dev) return;
-    const base = (dev.expiry_date && new Date(dev.expiry_date) > new Date()) ? new Date(dev.expiry_date) : new Date();
-    base.setDate(base.getDate() + 30);
-    await supabaseClient.from('devices').update({ expiry_date: base.toISOString(), is_active: true }).eq('id', deviceId);
-    showToast('تم مد 30 يوم', 'success');
-    loadDevices(currentBusinessId);
+    try {
+        const { data: dev } = await supabaseClient.from('devices').select('*').eq('id', deviceId).single();
+        if (!dev) return;
+        const base = (dev.expiry_date && new Date(dev.expiry_date) > new Date()) ? new Date(dev.expiry_date) : new Date();
+        base.setDate(base.getDate() + 30);
+        await supabaseClient.from('devices').update({ expiry_date: base.toISOString(), is_active: true }).eq('id', deviceId);
+        showToast('تم مد الاشتراك 30 يوم', 'success');
+        loadDevices(currentBusinessId);
+    } catch (e) {
+        showToast('فشل مد الاشتراك', 'error');
+    }
 }
 
 async function toggleRevokeDevice(deviceId, currentlyRevoked) {
-    await supabaseClient.from('devices').update({ revoked: !currentlyRevoked }).eq('id', deviceId);
-    loadDevices(currentBusinessId);
+    try {
+        await supabaseClient.from('devices').update({ revoked: !currentlyRevoked }).eq('id', deviceId);
+        showToast(currentlyRevoked ? 'تم تفعيل الجهاز تاني' : 'تم إيقاف الجهاز', 'success');
+        loadDevices(currentBusinessId);
+    } catch (e) {
+        showToast('فشل تغيير حالة الجهاز', 'error');
+    }
 }
 
 async function setLifetime(deviceId) {
-    if (!confirm('جعل الجهاز مدى الحياة؟')) return;
-    const lifetimeDate = new Date(9999, 11, 31).toISOString();
-    await supabaseClient.from('devices').update({ expiry_date: lifetimeDate, is_active: true }).eq('id', deviceId);
-    showToast('✅ مدى الحياة', 'success');
-    loadDevices(currentBusinessId);
+    if (!confirm('متأكد إنك عايز تخلي اشتراك الجهاز ده مدى الحياة (غير محدود)؟')) return;
+    try {
+        const lifetimeDate = new Date(9999, 11, 31).toISOString();
+        const { error } = await supabaseClient.from('devices').update({ expiry_date: lifetimeDate, is_active: true }).eq('id', deviceId);
+        if (error) { showToast('فشل: ' + error.message, 'error'); return; }
+        showToast('✅ تم جعل الاشتراك مدى الحياة', 'success');
+        loadDevices(currentBusinessId);
+    } catch (e) { showToast('حصل خطأ، حاول تاني.', 'error'); }
 }
 
 async function setAllLifetime() {
-    if (!confirm('جعل كل الأجهزة مدى الحياة؟')) return;
-    const lifetimeDate = new Date(9999, 11, 31).toISOString();
-    await supabaseClient.from('devices').update({ expiry_date: lifetimeDate, is_active: true }).eq('business_id', currentBusinessId);
-    showToast('✅ تم التحديث', 'success');
-    loadDevices(currentBusinessId);
+    if (!confirm('متأكد إنك عايز تخلي اشتراك كل الأجهزة في النشاط ده مدى الحياة؟')) return;
+    try {
+        const lifetimeDate = new Date(9999, 11, 31).toISOString();
+        const { error } = await supabaseClient.from('devices').update({ expiry_date: lifetimeDate, is_active: true }).eq('business_id', currentBusinessId).eq('revoked', false);
+        if (error) { showToast('فشل: ' + error.message, 'error'); return; }
+        showToast('✅ تم جعل اشتراك كل الأجهزة مدى الحياة', 'success');
+        loadDevices(currentBusinessId);
+    } catch (e) { showToast('حصل خطأ، حاول تاني.', 'error'); }
 }
 
-// ✅ 4. الحذف شغال 100% وهيظهر فوراً
-async function deleteBusiness() {
-    if (!confirm('متأكد؟ هيتمسح كل حاجة نهائي.')) return;
-    const { error } = await supabaseClient.from('businesses').delete().eq('id', currentBusinessId);
-    if (error) { showToast('فشل الحذف: ' + error.message, 'error'); return; }
-    showToast('تم الحذف', 'success');
-    showScreen('dashboardScreen');
-    loadBusinesses();
+function editDeviceType(deviceId) {
+    editingDeviceId = deviceId;
+    document.getElementById('editDeviceError').textContent = '';
+    supabaseClient.from('devices').select('*').eq('id', deviceId).single().then(({ data }) => {
+        if (data) {
+            document.getElementById('editDeviceType').value = data.device_type || 'unknown';
+            document.getElementById('editDeviceLabel').value = data.device_label || '';
+        }
+    });
+    openSheet('editDeviceOverlay');
 }
+
+async function submitEditDevice() {
+    const deviceType = document.getElementById('editDeviceType').value;
+    const deviceLabel = document.getElementById('editDeviceLabel').value.trim();
+    const errEl = document.getElementById('editDeviceError');
+    errEl.textContent = '';
+    if (!editingDeviceId) { errEl.textContent = 'حدث خطأ، حاول تاني.'; return; }
+    try {
+        const updateData = { device_type: deviceType };
+        if (deviceLabel) updateData.device_label = deviceLabel;
+        const { error } = await supabaseClient.from('devices').update(updateData).eq('id', editingDeviceId);
+        if (error) { errEl.textContent = 'فشل التحديث: ' + error.message; return; }
+        closeSheet('editDeviceOverlay');
+        showToast('تم تحديث نوع الجهاز', 'success');
+        loadDevices(currentBusinessId);
+    } catch (e) { errEl.textContent = 'حصل خطأ، حاول تاني.'; }
+}
+
+// ============================================================
+// TABLES
+// ============================================================
+async function loadTables(businessId) {
+    try {
+        const { data: tables } = await supabaseClient.from('tables').select('*').eq('business_id', businessId).order('number');
+        const el = document.getElementById('tablesList');
+        
+        const statusMap = {
+            'available': { label: 'متاحة', class: 'badge-teal' },
+            'occupied': { label: 'مشغولة', class: 'badge-gold' },
+            'reserved': { label: 'محجوزة', class: 'badge-purple' }
+        };
+        
+        el.innerHTML = (!tables || tables.length === 0)
+            ? '<div class="empty"><i class="fa-solid fa-table-cells"></i>مفيش طاولات — هتتولد تلقائياً عند أول استخدام</div>'
+            : tables.map(t => {
+                const status = statusMap[t.status] || statusMap['available'];
+                return `<div class="list-row">
+                    <div>
+                        <div class="row-title">طاولة #${t.number}</div>
+                        <div class="row-sub">${t.capacity} أشخاص · ${t.area || 'داخلي'}</div>
+                    </div>
+                    <span class="badge ${status.class}">${status.label}</span>
+                </div>`;
+            }).join('');
+    } catch (e) {
+        console.error('Error loading tables:', e);
+        document.getElementById('tablesList').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>فشل تحميل الطاولات</div>';
+    }
+}
+
+// ============================================================
+// SAMPLE MENU GENERATOR
+// ============================================================
+async function generateSampleMenu() {
+    if (!currentBusinessId) return;
+    if (!confirm('هيضيف أصناف تجريبية للمنيو (مشروبات وأكلات) — استمرار؟')) return;
+    
+    const sampleCategories = [
+        { name: 'مشروبات ساخنة', icon: 'fa-mug-hot' },
+        { name: 'مشروبات باردة', icon: 'fa-wine-glass' },
+        { name: 'أكلات خفيفة', icon: 'fa-burger' },
+        { name: 'حلويات', icon: 'fa-cake' }
+    ];
+    
+    const sampleItems = [
+        { name: 'قهوة عربية', price: 15, category: 'مشروبات ساخنة' },
+        { name: 'شاي', price: 10, category: 'مشروبات ساخنة' },
+        { name: 'كابتشينو', price: 25, category: 'مشروبات ساخنة' },
+        { name: 'عصير برتقال', price: 20, category: 'مشروبات باردة' },
+        { name: 'عصير فراولة', price: 22, category: 'مشروبات باردة' },
+        { name: 'مياه غازية', price: 10, category: 'مشروبات باردة' },
+        { name: 'ساندويتش جبنة', price: 30, category: 'أكلات خفيفة' },
+        { name: 'ساندويتش فلافل', price: 25, category: 'أكلات خفيفة' },
+        { name: 'بطاطس مقلي', price: 15, category: 'أكلات خفيفة' },
+        { name: 'كنافة', price: 35, category: 'حلويات' },
+        { name: 'قطايف', price: 30, category: 'حلويات' },
+        { name: 'تشيز كيك', price: 40, category: 'حلويات' }
+    ];
+    
+    try {
+        // Check if menu_categories table exists
+        const { error: catCheckError } = await supabaseClient.from('menu_categories').select('count', { count: 'exact', head: true }).eq('business_id', currentBusinessId);
+        if (catCheckError) {
+            showToast('⚠️ جدول menu_categories مش موجود — شغل الـ SQL الأول', 'error');
+            return;
+        }
+        
+        // Create categories
+        for (const cat of sampleCategories) {
+            const { data: existing } = await supabaseClient
+                .from('menu_categories')
+                .select('id')
+                .eq('business_id', currentBusinessId)
+                .eq('name', cat.name)
+                .maybeSingle();
+            
+            if (!existing) {
+                await supabaseClient.from('menu_categories').insert({
+                    business_id: currentBusinessId,
+                    name: cat.name,
+                    icon: cat.icon,
+                    is_active: true
+                });
+            }
+        }
+        
+        // Get categories
+        const { data: categories } = await supabaseClient
+            .from('menu_categories')
+            .select('*')
+            .eq('business_id', currentBusinessId);
+        
+        // Check if menu_items table exists
+        const { error: itemCheckError } = await supabaseClient.from('menu_items').select('count', { count: 'exact', head: true }).eq('business_id', currentBusinessId);
+        if (itemCheckError) {
+            showToast('⚠️ جدول menu_items مش موجود — شغل الـ SQL الأول', 'error');
+            return;
+        }
+        
+        // Create items
+        for (const item of sampleItems) {
+            const cat = categories.find(c => c.name === item.category);
+            const { data: existing } = await supabaseClient
+                .from('menu_items')
+                .select('id')
+                .eq('business_id', currentBusinessId)
+                .eq('name', item.name)
+                .maybeSingle();
+            
+            if (!existing) {
+                await supabaseClient.from('menu_items').insert({
+                    business_id: currentBusinessId,
+                    category_id: cat ? cat.id : null,
+                    name: item.name,
+                    price: item.price,
+                    is_active: true,
+                    is_available: true
+                });
+            }
+        }
+        
+        showToast('✅ تم توليد المنيو التجريبي بنجاح!', 'success');
+    } catch (e) {
+        console.error('Error generating sample menu:', e);
+        showToast('فشل توليد المنيو: ' + e.message, 'error');
+    }
+}
+
+// ============================================================
+// DELETE BUSINESS
+// ============================================================
+async function deleteBusiness() {
+    if (!confirm('متأكد؟ ده هيمسح النشاط وكل بياناته نهائيًا ومينفعش ترجعه.')) return;
+    try {
+        const { error } = await supabaseClient.from('businesses').delete().eq('id', currentBusinessId);
+        if (error) { showToast('فشل الحذف: ' + error.message, 'error'); return; }
+        showToast('تم حذف النشاط', 'success');
+        showScreen('dashboardScreen');
+        loadBusinesses();
+    } catch (e) {
+        showToast('فشل الحذف', 'error');
+    }
+}
+
+// ============================================================
+// AUTO-START
+// ============================================================
+console.log('🍽️ Plate Pro — Admin Panel');
+console.log('🔗 Connected to Supabase');
+console.log('📌 Supabase URL:', SUPABASE_URL);
 </script>
 </body>
 </html>
