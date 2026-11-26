@@ -2,12 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' https://bccuzjjnrqnmqwcypucr.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>Plate Pro — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" crossorigin="anonymous"></script>
 <style>
 /* ============================================================
    DESIGN SYSTEM — Plate Pro Admin
@@ -107,7 +110,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .back-btn:hover { color: var(--text); }
 .code-chip { font-family: var(--font-mono); background: var(--bg-sunken); border: 1px solid var(--border); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 15px; letter-spacing: .05em; }
 
-.debug-box { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-top: 8px; font-size: 12px; font-family: var(--font-mono); color: var(--text-dim); max-height: 200px; overflow: auto; white-space: pre-wrap; }
+.debug-box-unused { background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-top: 8px; font-size: 12px; font-family: var(--font-mono); color: var(--text-dim); max-height: 200px; overflow: auto; white-space: pre-wrap; }
 </style>
 </head>
 <body>
@@ -119,10 +122,14 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
         <div class="brand-title">لوحة الأدمن</div>
         <div class="card">
             <div class="field">
-                <label>كلمة مرور الأدمن</label>
-                <input type="password" id="adminPassword" placeholder="••••••••">
+                <label>إيميل الأدمن</label>
+                <input type="email" id="adminEmail" autocomplete="username" placeholder="admin@example.com" dir="ltr">
             </div>
-            <button class="btn btn-gold btn-block" onclick="handleAdminLogin()"><i class="fa-solid fa-unlock"></i> دخول</button>
+            <div class="field">
+                <label>كلمة مرور الأدمن</label>
+                <input type="password" id="adminPassword" autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button class="btn btn-gold btn-block" id="adminLoginBtn" onclick="handleAdminLogin()"><i class="fa-solid fa-unlock"></i> دخول</button>
             <div class="error-text" id="loginError"></div>
         </div>
     </div>
@@ -155,6 +162,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
             <button class="btn btn-red btn-sm" onclick="deleteBusiness()"><i class="fa-solid fa-trash"></i> حذف النشاط</button>
             <button class="btn btn-teal btn-sm" onclick="setAllLifetime()"><i class="fa-solid fa-infinity"></i> جعل كل الأجهزة مدى الحياة</button>
+            <button class="btn btn-ghost btn-sm" onclick="openResetPin()"><i class="fa-solid fa-key"></i> تغيير PIN المالك</button>
             <button class="btn btn-ghost btn-sm" onclick="generateSampleMenu()"><i class="fa-solid fa-utensils"></i> توليد منيو تجريبي</button>
         </div>
 
@@ -176,11 +184,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
         <div class="sheet-title">إنشاء مطعم / كافيه جديد<button class="close-x" onclick="closeSheet('createBusinessOverlay')"><i class="fa-solid fa-xmark"></i></button></div>
         <div class="field"><label>كود النشاط (بالإنجليزي، بدون مسافات)</label><input type="text" id="newBizCode" class="mono" style="text-transform:uppercase" placeholder="CAFE01"></div>
         <div class="field"><label>اسم المطعم / الكافيه</label><input type="text" id="newBizName" placeholder="اسم المحل"></div>
-        <div class="field"><label>PIN المالك (4 أرقام)</label><input type="text" inputmode="numeric" maxlength="6" id="newBizPin" class="mono" placeholder="1234"></div>
+        <div class="field"><label>PIN المالك (6 إلى 8 أرقام)</label><input type="password" autocomplete="new-password" inputmode="numeric" maxlength="8" id="newBizPin" class="mono" placeholder="••••••"></div>
         <button class="btn btn-gold btn-block" onclick="submitCreateBusiness()">إنشاء</button>
         <div class="error-text" id="createBizError"></div>
         <div class="success-text" id="createBizSuccess"></div>
-        <div class="debug-box" id="createBizDebug"></div>
     </div>
 </div>
 
@@ -206,6 +213,16 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
     </div>
 </div>
 
+<!-- ============== RESET OWNER PIN SHEET ============== -->
+<div class="overlay" id="resetPinOverlay">
+    <div class="sheet">
+        <div class="sheet-title">تغيير PIN المالك<button class="close-x" onclick="closeSheet('resetPinOverlay')"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="field"><label>PIN جديد (6 إلى 8 أرقام)</label><input type="password" autocomplete="new-password" inputmode="numeric" maxlength="8" id="resetPinInput" class="mono" placeholder="••••••"></div>
+        <button class="btn btn-gold btn-block" onclick="submitResetPin()">حفظ</button>
+        <div class="error-text" id="resetPinError"></div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -214,10 +231,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 // ============================================================
 const SUPABASE_URL = 'https://bccuzjjnrqnmqwcypucr.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_X3pnp718gcVx9-wrisvtHw_44hMVVZ_';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Admin password (change this before deploying!)
-const ADMIN_PASSWORD = '1234';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: false }
+});
+let adminEmail = null;
 
 let currentBusinessId = null;
 let editingDeviceId = null;
@@ -233,27 +250,49 @@ function showToast(msg, type = 'success') {
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function openSheet(id) { document.getElementById(id).classList.add('show'); }
 function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
-function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str ?? ''; return d.innerHTML; }
-function randomCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let out = '';
-    for (let i = 0; i < 8; i++) { out += chars[Math.floor(Math.random() * chars.length)]; if (i === 3) out += '-'; }
-    return out;
+function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"'`]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
 }
+function safeId(v) { const x = String(v ?? ''); return /^[A-Za-z0-9_-]{1,64}$/.test(x) ? x : ''; }
+
 
 // ============================================================
 // AUTH
 // ============================================================
-function handleAdminLogin() {
+async function handleAdminLogin() {
+    const email = document.getElementById('adminEmail').value.trim();
     const pass = document.getElementById('adminPassword').value;
     const err = document.getElementById('loginError');
-    if (pass !== ADMIN_PASSWORD) { err.textContent = 'كلمة المرور غلط.'; return; }
     err.textContent = '';
-    document.getElementById('adminPassword').value = '';
-    showScreen('dashboardScreen');
-    loadBusinesses();
+    if (!email || !pass) { err.textContent = 'اكتب الإيميل وكلمة المرور.'; return; }
+    const btn = document.getElementById('adminLoginBtn');
+    btn.disabled = true;
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+        if (error || !data || !data.user) { err.textContent = 'بيانات الدخول غلط.'; return; }
+        if (data.user.app_metadata?.role !== 'super_admin') {
+            await supabaseClient.auth.signOut();
+            err.textContent = 'بيانات الدخول غلط.';
+            return;
+        }
+        adminEmail = data.user.email;
+        document.getElementById('adminPassword').value = '';
+        showScreen('dashboardScreen');
+        loadBusinesses();
+        resetIdle();
+    } catch (e) {
+        err.textContent = 'خطأ في الاتصال.';
+    } finally { btn.disabled = false; }
 }
-function logoutAdmin() { showScreen('loginScreen'); }
+async function logoutAdmin() {
+    try { await supabaseClient.auth.signOut(); } catch (e) {}
+    adminEmail = null; currentBusinessId = null;
+    clearTimeout(_idleT);
+    showScreen('loginScreen');
+}
+let _idleT;
+function resetIdle() { clearTimeout(_idleT); if (adminEmail) _idleT = setTimeout(logoutAdmin, 15 * 60 * 1000); }
+['click', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
 
 // ============================================================
 // DASHBOARD — businesses list
@@ -264,7 +303,7 @@ async function loadBusinesses() {
         const grid = document.getElementById('businessGrid');
         if (error) { 
             console.error('Error loading businesses:', error);
-            grid.innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>فشل تحميل البيانات: ' + error.message + '</div>'; 
+            grid.innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>فشل تحميل البيانات: ' + escapeHtml(error.message) + '</div>'; 
             return; 
         }
         if (!businesses || businesses.length === 0) { 
@@ -283,7 +322,7 @@ async function loadBusinesses() {
         }));
 
         grid.innerHTML = withCounts.map(b => `
-            <div class="biz-card" onclick="openBusinessDetail('${b.id}')">
+            <div class="biz-card" onclick="openBusinessDetail('${safeId(b.id)}')">
                 <div class="row-title">🍽️ ${escapeHtml(b.name)}</div>
                 <div class="row-sub mono">${escapeHtml(b.code)}</div>
                 <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
@@ -301,7 +340,6 @@ function openCreateBusinessSheet() {
     ['newBizCode','newBizName','newBizPin'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('createBizError').textContent = '';
     document.getElementById('createBizSuccess').textContent = '';
-    document.getElementById('createBizDebug').textContent = '';
     openSheet('createBusinessOverlay');
 }
 
@@ -311,54 +349,24 @@ function openCreateBusinessSheet() {
 async function submitCreateBusiness() {
     const code = document.getElementById('newBizCode').value.trim().toUpperCase();
     const name = document.getElementById('newBizName').value.trim();
-    const owner_pin = document.getElementById('newBizPin').value.trim();
+    const pin = document.getElementById('newBizPin').value.trim();
     const err = document.getElementById('createBizError');
     const success = document.getElementById('createBizSuccess');
-    const debug = document.getElementById('createBizDebug');
-    
-    err.textContent = '';
-    success.textContent = '';
-    debug.textContent = '';
-
-    if (!code || !name) { err.textContent = 'اكتب الكود والاسم.'; return; }
-    if (!/^\d{4,6}$/.test(owner_pin)) { err.textContent = 'PIN المالك لازم يكون 4 لـ 6 أرقام.'; return; }
-
-    // ✅ البيانات مع owner_pin
-    const bizData = {
-        code: code,
-        name: name,
-        owner_pin: owner_pin
-    };
-
-    debug.textContent = '📤 البيانات المرسلة:\n' + JSON.stringify(bizData, null, 2);
-
+    err.textContent = ''; success.textContent = '';
+    if (!/^[A-Z0-9-]{3,20}$/.test(code)) { err.textContent = 'الكود: حروف إنجليزي وأرقام و - فقط (من 3 لـ 20).'; return; }
+    if (!name || name.length > 100) { err.textContent = 'اكتب اسم النشاط (حتى 100 حرف).'; return; }
+    if (!/^\d{6,8}$/.test(pin)) { err.textContent = 'PIN المالك لازم يكون 6 لـ 8 أرقام.'; return; }
     try {
-        const { data, error } = await supabaseClient.from('businesses').insert(bizData).select();
-        
-        debug.textContent += '\n\n📥 الرد:\n' + JSON.stringify({ data, error }, null, 2);
-        
+        const { error } = await supabaseClient.rpc('create_business_admin', { p_code: code, p_name: name, p_owner_pin: pin, p_admin_email: adminEmail });
         if (error) {
-            console.error('Insert error:', error);
-            err.textContent = '❌ فشل الإنشاء: ' + error.message + (error.details ? ' (' + error.details + ')' : '');
-            if (error.code === '23505') {
-                err.textContent = '❌ الكود ده مستخدم قبل كده.';
-            }
+            err.textContent = error.code === '23505' ? '❌ الكود ده مستخدم قبل كده.' : '❌ فشل الإنشاء.';
             return;
         }
-        
-        success.textContent = '✅ تم إنشاء المطعم / الكافيه بنجاح! 🎉';
+        document.getElementById('newBizPin').value = '';
+        success.textContent = '✅ تم إنشاء النشاط بنجاح (8 طاولات تلقائياً)';
         showToast('تم إنشاء النشاط بنجاح 🎉', 'success');
-        
-        setTimeout(() => {
-            closeSheet('createBusinessOverlay');
-            loadBusinesses();
-        }, 1500);
-        
-    } catch (e) {
-        console.error('Unexpected error:', e);
-        err.textContent = '❌ حدث خطأ غير متوقع: ' + e.message;
-        debug.textContent += '\n\n❌ Exception:\n' + e.stack;
-    }
+        setTimeout(() => { closeSheet('createBusinessOverlay'); loadBusinesses(); }, 1200);
+    } catch (e) { err.textContent = '❌ حدث خطأ غير متوقع.'; }
 }
 
 // ============================================================
@@ -376,7 +384,6 @@ async function openBusinessDetail(id) {
         document.getElementById('detailBizTitle').textContent = '🍽️ ' + biz.name;
         document.getElementById('detailBizInfo').innerHTML = `
             <div class="list-row"><div class="row-title">الكود</div><div class="code-chip">${escapeHtml(biz.code)}</div></div>
-            <div class="list-row"><div class="row-title">PIN المالك</div><div class="code-chip">${escapeHtml(biz.owner_pin)}</div></div>
             <div class="list-row"><div class="row-title">تاريخ الإنشاء</div><div class="row-sub mono">${new Date(biz.created_at).toLocaleDateString('ar-EG')}</div></div>`;
 
         showScreen('businessDetailScreen');
@@ -411,15 +418,12 @@ async function loadCodes(businessId) {
 }
 
 async function generateActivationCode() {
-    const code = randomCode();
     try {
-        const { error } = await supabaseClient.from('activation_codes').insert({ business_id: currentBusinessId, code });
-        if (error) { showToast('فشل توليد الكود: ' + error.message, 'error'); return; }
+        const { data: code, error } = await supabaseClient.rpc('generate_activation_code', { p_business: currentBusinessId });
+        if (error) { showToast('فشل توليد الكود', 'error'); return; }
         showToast('تم توليد الكود: ' + code, 'success');
         loadCodes(currentBusinessId);
-    } catch (e) {
-        showToast('فشل توليد الكود', 'error');
-    }
+    } catch (e) { showToast('فشل توليد الكود', 'error'); }
 }
 
 // ============================================================
@@ -458,10 +462,10 @@ async function loadDevices(businessId) {
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         ${statusBadge}
-                        <button class="btn btn-ghost btn-sm" onclick="setLifetime('${d.id}')" title="جعل الاشتراك مدى الحياة" style="color:var(--purple);"><i class="fa-solid fa-infinity"></i></button>
-                        <button class="btn btn-ghost btn-sm" onclick="editDeviceType('${d.id}')" title="تعديل نوع الجهاز"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn btn-ghost btn-sm" onclick="extendDevice('${d.id}')" title="مد الاشتراك 30 يوم"><i class="fa-solid fa-calendar-plus"></i></button>
-                        <button class="btn btn-ghost btn-sm" onclick="toggleRevokeDevice('${d.id}', ${d.revoked})"><i class="fa-solid ${d.revoked ? 'fa-lock-open' : 'fa-lock'}"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="setLifetime('${safeId(d.id)}')" title="جعل الاشتراك مدى الحياة" style="color:var(--purple);"><i class="fa-solid fa-infinity"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="editDeviceType('${safeId(d.id)}')" title="تعديل نوع الجهاز"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="extendDevice('${safeId(d.id)}')" title="مد الاشتراك 30 يوم"><i class="fa-solid fa-calendar-plus"></i></button>
+                        <button class="btn btn-ghost btn-sm" onclick="toggleRevokeDevice('${safeId(d.id)}', ${d.revoked})"><i class="fa-solid ${d.revoked ? 'fa-lock-open' : 'fa-lock'}"></i></button>
                     </div>
                 </div>`;
             }).join('');
@@ -566,8 +570,8 @@ async function loadTables(businessId) {
                 const status = statusMap[t.status] || statusMap['available'];
                 return `<div class="list-row">
                     <div>
-                        <div class="row-title">طاولة #${t.number}</div>
-                        <div class="row-sub">${t.capacity} أشخاص · ${t.area || 'داخلي'}</div>
+                        <div class="row-title">طاولة #${Number(t.number)}</div>
+                        <div class="row-sub">${Number(t.capacity) || 4} أشخاص · ${escapeHtml(t.area || 'داخلي')}</div>
                     </div>
                     <span class="badge ${status.class}">${status.label}</span>
                 </div>`;
@@ -584,96 +588,29 @@ async function loadTables(businessId) {
 async function generateSampleMenu() {
     if (!currentBusinessId) return;
     if (!confirm('هيضيف أصناف تجريبية للمنيو (مشروبات وأكلات) — استمرار؟')) return;
-    
-    const sampleCategories = [
-        { name: 'مشروبات ساخنة', icon: 'fa-mug-hot' },
-        { name: 'مشروبات باردة', icon: 'fa-wine-glass' },
-        { name: 'أكلات خفيفة', icon: 'fa-burger' },
-        { name: 'حلويات', icon: 'fa-cake' }
-    ];
-    
-    const sampleItems = [
-        { name: 'قهوة عربية', price: 15, category: 'مشروبات ساخنة' },
-        { name: 'شاي', price: 10, category: 'مشروبات ساخنة' },
-        { name: 'كابتشينو', price: 25, category: 'مشروبات ساخنة' },
-        { name: 'عصير برتقال', price: 20, category: 'مشروبات باردة' },
-        { name: 'عصير فراولة', price: 22, category: 'مشروبات باردة' },
-        { name: 'مياه غازية', price: 10, category: 'مشروبات باردة' },
-        { name: 'ساندويتش جبنة', price: 30, category: 'أكلات خفيفة' },
-        { name: 'ساندويتش فلافل', price: 25, category: 'أكلات خفيفة' },
-        { name: 'بطاطس مقلي', price: 15, category: 'أكلات خفيفة' },
-        { name: 'كنافة', price: 35, category: 'حلويات' },
-        { name: 'قطايف', price: 30, category: 'حلويات' },
-        { name: 'تشيز كيك', price: 40, category: 'حلويات' }
-    ];
-    
     try {
-        // Check if menu_categories table exists
-        const { error: catCheckError } = await supabaseClient.from('menu_categories').select('count', { count: 'exact', head: true }).eq('business_id', currentBusinessId);
-        if (catCheckError) {
-            showToast('⚠️ جدول menu_categories مش موجود — شغل الـ SQL الأول', 'error');
-            return;
-        }
-        
-        // Create categories
-        for (const cat of sampleCategories) {
-            const { data: existing } = await supabaseClient
-                .from('menu_categories')
-                .select('id')
-                .eq('business_id', currentBusinessId)
-                .eq('name', cat.name)
-                .maybeSingle();
-            
-            if (!existing) {
-                await supabaseClient.from('menu_categories').insert({
-                    business_id: currentBusinessId,
-                    name: cat.name,
-                    icon: cat.icon,
-                    is_active: true
-                });
-            }
-        }
-        
-        // Get categories
-        const { data: categories } = await supabaseClient
-            .from('menu_categories')
-            .select('*')
-            .eq('business_id', currentBusinessId);
-        
-        // Check if menu_items table exists
-        const { error: itemCheckError } = await supabaseClient.from('menu_items').select('count', { count: 'exact', head: true }).eq('business_id', currentBusinessId);
-        if (itemCheckError) {
-            showToast('⚠️ جدول menu_items مش موجود — شغل الـ SQL الأول', 'error');
-            return;
-        }
-        
-        // Create items
-        for (const item of sampleItems) {
-            const cat = categories.find(c => c.name === item.category);
-            const { data: existing } = await supabaseClient
-                .from('menu_items')
-                .select('id')
-                .eq('business_id', currentBusinessId)
-                .eq('name', item.name)
-                .maybeSingle();
-            
-            if (!existing) {
-                await supabaseClient.from('menu_items').insert({
-                    business_id: currentBusinessId,
-                    category_id: cat ? cat.id : null,
-                    name: item.name,
-                    price: item.price,
-                    is_active: true,
-                    is_available: true
-                });
-            }
-        }
-        
+        const { error } = await supabaseClient.rpc('admin_generate_sample_menu', { p_business: currentBusinessId });
+        if (error) { showToast('فشل توليد المنيو', 'error'); return; }
         showToast('✅ تم توليد المنيو التجريبي بنجاح!', 'success');
-    } catch (e) {
-        console.error('Error generating sample menu:', e);
-        showToast('فشل توليد المنيو: ' + e.message, 'error');
-    }
+    } catch (e) { showToast('فشل توليد المنيو', 'error'); }
+}
+function openResetPin() {
+    document.getElementById('resetPinInput').value = '';
+    document.getElementById('resetPinError').textContent = '';
+    openSheet('resetPinOverlay');
+}
+async function submitResetPin() {
+    const pin = document.getElementById('resetPinInput').value.trim();
+    const err = document.getElementById('resetPinError');
+    err.textContent = '';
+    if (!/^\d{6,8}$/.test(pin)) { err.textContent = 'PIN لازم يكون 6 لـ 8 أرقام.'; return; }
+    try {
+        const { error } = await supabaseClient.rpc('admin_reset_owner_pin', { p_business: currentBusinessId, p_pin: pin });
+        if (error) { err.textContent = 'فشل تغيير الـ PIN.'; return; }
+        document.getElementById('resetPinInput').value = '';
+        closeSheet('resetPinOverlay');
+        showToast('✅ تم تغيير PIN المالك وإنهاء جلساته', 'success');
+    } catch (e) { err.textContent = 'حصل خطأ، حاول تاني.'; }
 }
 
 // ============================================================
@@ -695,9 +632,6 @@ async function deleteBusiness() {
 // ============================================================
 // AUTO-START
 // ============================================================
-console.log('🍽️ Plate Pro — Admin Panel');
-console.log('🔗 Connected to Supabase');
-console.log('📌 Supabase URL:', SUPABASE_URL);
 </script>
 </body>
 </html>
