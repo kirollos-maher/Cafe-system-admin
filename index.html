@@ -6,14 +6,14 @@
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>Plate Pro — Admin</title>
+<title>Nizam - نظام | الأدمن</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" crossorigin="anonymous"></script>
 <style>
 /* ============================================================
-   DESIGN SYSTEM — Plate Pro Admin
+   DESIGN SYSTEM — Nizam Admin
    ============================================================ */
 :root {
     --gold: #C9A050;
@@ -39,7 +39,7 @@
     --radius-md: 12px;
     --radius-lg: 18px;
     --font-display: 'Cairo', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-mono: 'Cairo', sans-serif;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,7 +53,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .screen { display: none; min-height: 100vh; }
 .screen.active { display: block; }
 .centered-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-.brand-mark { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+.brand-mark { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
 .brand-title { font-size: 22px; font-weight: 800; margin-bottom: 24px; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; width: 100%; max-width: 380px; }
 .field { margin-bottom: 14px; text-align: right; }
@@ -73,7 +73,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .error-text { color: var(--red); font-size: 13px; margin-top: 8px; min-height: 16px; }
 .success-text { color: var(--teal); font-size: 13px; margin-top: 8px; min-height: 16px; }
 
-.topbar { position: sticky; top: 0; z-index: 20; background: rgba(12,15,18,.92); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.topbar { position: sticky; top: 0; z-index: 20; background: var(--bg-raised); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
 .topbar .title { font-weight: 800; font-size: 15px; }
 .topbar .title .gold { color: var(--gold); }
 .wrap { max-width: 900px; margin: 0 auto; padding: 18px; }
@@ -118,7 +118,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 <!-- ============== LOGIN ============== -->
 <div id="loginScreen" class="screen active">
     <div class="centered-screen">
-        <div class="brand-mark">🍽️ PLATE PRO</div>
+        <div class="brand-mark">Nizam - نظام</div>
         <div class="brand-title">لوحة الأدمن</div>
         <div class="card">
             <div class="field">
@@ -199,9 +199,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
             <label>نوع الجهاز</label>
             <select id="editDeviceType">
                 <option value="unknown">❓ غير معروف</option>
-                <option value="phone">📱 تليفون</option>
-                <option value="tablet">📱 تابلت</option>
-                <option value="computer">💻 كمبيوتر</option>
+                <option value="phone">تليفون</option>
+                <option value="tablet">تابلت</option>
+                <option value="computer">كمبيوتر</option>
             </select>
         </div>
         <div class="field">
@@ -227,7 +227,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 
 <script>
 // ============================================================
-// CONFIG — Plate Pro Supabase
+// CONFIG — Nizam Supabase
 // ============================================================
 const SUPABASE_URL = 'https://bccuzjjnrqnmqwcypucr.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_X3pnp718gcVx9-wrisvtHw_44hMVVZ_';
@@ -323,7 +323,7 @@ async function loadBusinesses() {
 
         grid.innerHTML = withCounts.map(b => `
             <div class="biz-card" onclick="openBusinessDetail('${safeId(b.id)}')">
-                <div class="row-title">🍽️ ${escapeHtml(b.name)}</div>
+                <div class="row-title">${escapeHtml(b.name)}</div>
                 <div class="row-sub mono">${escapeHtml(b.code)}</div>
                 <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
                     <span class="badge badge-teal">${b.deviceCount} جهاز</span>
@@ -359,14 +359,14 @@ async function submitCreateBusiness() {
     try {
         const { error } = await supabaseClient.rpc('create_business_admin', { p_code: code, p_name: name, p_owner_pin: pin, p_admin_email: adminEmail });
         if (error) {
-            err.textContent = error.code === '23505' ? '❌ الكود ده مستخدم قبل كده.' : '❌ فشل الإنشاء.';
+            err.textContent = error.code === '23505' ? 'الكود ده مستخدم قبل كده.' : 'فشل الإنشاء.';
             return;
         }
         document.getElementById('newBizPin').value = '';
-        success.textContent = '✅ تم إنشاء النشاط بنجاح (8 طاولات تلقائياً)';
-        showToast('تم إنشاء النشاط بنجاح 🎉', 'success');
+        success.textContent = 'تم إنشاء النشاط بنجاح (8 طاولات تلقائياً)';
+        showToast('تم إنشاء النشاط بنجاح ', 'success');
         setTimeout(() => { closeSheet('createBusinessOverlay'); loadBusinesses(); }, 1200);
-    } catch (e) { err.textContent = '❌ حدث خطأ غير متوقع.'; }
+    } catch (e) { err.textContent = 'حدث خطأ غير متوقع.'; }
 }
 
 // ============================================================
@@ -381,7 +381,7 @@ async function openBusinessDetail(id) {
             return; 
         }
 
-        document.getElementById('detailBizTitle').textContent = '🍽️ ' + biz.name;
+        document.getElementById('detailBizTitle').textContent = '' + biz.name;
         document.getElementById('detailBizInfo').innerHTML = `
             <div class="list-row"><div class="row-title">الكود</div><div class="code-chip">${escapeHtml(biz.code)}</div></div>
             <div class="list-row"><div class="row-title">تاريخ الإنشاء</div><div class="row-sub mono">${new Date(biz.created_at).toLocaleDateString('ar-EG')}</div></div>`;
@@ -449,11 +449,11 @@ async function loadDevices(businessId) {
                 const expired = expiry && expiry < new Date() && !isLifetime;
                 const statusBadge = d.revoked ? '<span class="badge badge-red">موقوف</span>' 
                     : expired ? '<span class="badge badge-gold">منتهي</span>' 
-                    : isLifetime ? '<span class="badge badge-purple">♾️ مدى الحياة</span>' 
+                    : isLifetime ? '<span class="badge badge-purple">مدى الحياة</span>' 
                     : '<span class="badge badge-teal">نشط</span>';
                 const deviceType = deviceTypeMap[d.device_type] || deviceTypeMap['unknown'];
                 const deviceLabel = d.device_label || 'جهاز بدون اسم';
-                const expiryText = isLifetime ? '♾️ مدى الحياة' : (expiry ? 'ينتهي ' + expiry.toLocaleDateString('ar-EG') : 'بدون تاريخ انتهاء');
+                const expiryText = isLifetime ? 'مدى الحياة' : (expiry ? 'ينتهي ' + expiry.toLocaleDateString('ar-EG') : 'بدون تاريخ انتهاء');
                 
                 return `<div class="list-row">
                     <div>
@@ -505,7 +505,7 @@ async function setLifetime(deviceId) {
         const lifetimeDate = new Date(9999, 11, 31).toISOString();
         const { error } = await supabaseClient.from('devices').update({ expiry_date: lifetimeDate, is_active: true }).eq('id', deviceId);
         if (error) { showToast('فشل: ' + error.message, 'error'); return; }
-        showToast('✅ تم جعل الاشتراك مدى الحياة', 'success');
+        showToast('تم جعل الاشتراك مدى الحياة', 'success');
         loadDevices(currentBusinessId);
     } catch (e) { showToast('حصل خطأ، حاول تاني.', 'error'); }
 }
@@ -516,7 +516,7 @@ async function setAllLifetime() {
         const lifetimeDate = new Date(9999, 11, 31).toISOString();
         const { error } = await supabaseClient.from('devices').update({ expiry_date: lifetimeDate, is_active: true }).eq('business_id', currentBusinessId).eq('revoked', false);
         if (error) { showToast('فشل: ' + error.message, 'error'); return; }
-        showToast('✅ تم جعل اشتراك كل الأجهزة مدى الحياة', 'success');
+        showToast('تم جعل اشتراك كل الأجهزة مدى الحياة', 'success');
         loadDevices(currentBusinessId);
     } catch (e) { showToast('حصل خطأ، حاول تاني.', 'error'); }
 }
@@ -591,7 +591,7 @@ async function generateSampleMenu() {
     try {
         const { error } = await supabaseClient.rpc('admin_generate_sample_menu', { p_business: currentBusinessId });
         if (error) { showToast('فشل توليد المنيو', 'error'); return; }
-        showToast('✅ تم توليد المنيو التجريبي بنجاح!', 'success');
+        showToast('تم توليد المنيو التجريبي بنجاح!', 'success');
     } catch (e) { showToast('فشل توليد المنيو', 'error'); }
 }
 function openResetPin() {
@@ -609,7 +609,7 @@ async function submitResetPin() {
         if (error) { err.textContent = 'فشل تغيير الـ PIN.'; return; }
         document.getElementById('resetPinInput').value = '';
         closeSheet('resetPinOverlay');
-        showToast('✅ تم تغيير PIN المالك وإنهاء جلساته', 'success');
+        showToast('تم تغيير PIN المالك وإنهاء جلساته', 'success');
     } catch (e) { err.textContent = 'حصل خطأ، حاول تاني.'; }
 }
 
